@@ -1,0 +1,13 @@
+/* Optional stylesheet integration only. ParticleText already registers this
+   local face through FontFace; no shared CSS change is required.
+   Original font: https://fonts.google.com/specimen/Ma+Shan+Zheng
+   Download: https://fonts.gstatic.com/s/mashanzheng/v18/NaPecZTRCLxvwo41b4gvzkXaRMQ.ttf
+   Copyright 2018 The Ma Shan Zheng Project Authors.
+   Redistributed unmodified under SIL OFL 1.1; see OFL.txt. */
+@font-face {
+  font-family: 'Particle Ma Shan Zheng';
+  font-style: normal;
+  font-weight: 400;
+  src: url('./MaShanZheng-Regular.ttf') format('truetype');
+  font-display: block;
+}
