@@ -78,15 +78,8 @@ export class HandTracker {
       this.onStatus("Requesting camera permission…");
       window.addEventListener("pagehide", this.pagehide);
       // 模型/wasm 的下载与摄像头授权并行：授权弹窗那几秒正好用来下 8 MB 资源。
-      if (!this.assetTask)
-        this.assetTask = warmHandAssets().catch((error: unknown) => {
-          writeHandDiagnostics({
-            lastError: `asset download: ${
-              error instanceof Error ? error.message : String(error)
-            }`,
-          });
-          return null;
-        });
+      // 微信内置浏览器多半拿不到摄像头（只会用手势按钮），先别白花这 8 MB 流量。
+      if (!/MicroMessenger/i.test(navigator.userAgent)) void this.ensureAssets();
       // Request immediately when started; the browser owns the permission prompt.
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
@@ -163,6 +156,20 @@ export class HandTracker {
     });
   }
 
+  /** 资源下载只做一次；失败降级为「交给 MediaPipe 自己取」。 */
+  private ensureAssets(): Promise<HandAssets | null> {
+    if (!this.assetTask)
+      this.assetTask = warmHandAssets().catch((error: unknown) => {
+        writeHandDiagnostics({
+          lastError: `asset download: ${
+            error instanceof Error ? error.message : String(error)
+          }`,
+        });
+        return null;
+      });
+    return this.assetTask;
+  }
+
   private async initWorker(generation: number): Promise<void> {
     if (
       typeof Worker === "undefined" ||
@@ -170,7 +177,7 @@ export class HandTracker {
     )
       throw new Error("Worker bitmap inference is unsupported.");
     // 等预下载完成（首次约 8 MB，之后走 IndexedDB 直接命中）。
-    const assets = await this.assetTask;
+    const assets = await this.ensureAssets();
     if (!this.current(generation)) return;
     const payload = assets
       ? {
@@ -240,7 +247,7 @@ export class HandTracker {
         ? "Loading CPU tracker…"
         : "Loading main-thread tracker…",
     );
-    const assets = await this.assetTask;
+    const assets = await this.ensureAssets();
     const result = await createDetector(window.location.href, cpuOnly, assets);
     if (!this.current(generation)) {
       result.detector.close();
