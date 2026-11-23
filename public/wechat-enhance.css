@@ -1,0 +1,228 @@
+/* 分享增强层：只负责微信提示与移动端手势入口，不改变原有渲染与交互 */
+
+.xm-preview {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ---------- 微信顶部提示条 ---------- */
+.xm-wx-pill {
+  position: fixed;
+  left: 50%;
+  top: calc(10px + env(safe-area-inset-top));
+  transform: translateX(-50%);
+  z-index: 80;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  max-width: calc(100% - 24px);
+  padding: 7px 14px;
+  border-radius: 999px;
+  border: 1px solid #c99a5588;
+  background: #17100899;
+  color: #ecd7ac;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  line-height: 1.2;
+  white-space: nowrap;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 8px 26px #0007;
+  animation: xm-fade 0.45s ease both;
+}
+.xm-wx-pill b {
+  color: #ffd79a;
+  font-weight: 500;
+}
+.xm-wx-pill .xm-arrow {
+  font-size: 11px;
+  opacity: 0.75;
+}
+
+/* ---------- 微信说明面板 ---------- */
+.xm-sheet-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: #000000a8;
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  animation: xm-fade 0.25s ease both;
+  padding: 16px;
+  padding-bottom: calc(16px + env(safe-area-inset-bottom));
+}
+.xm-sheet {
+  width: min(480px, 100%);
+  border-radius: 16px;
+  border: 1px solid #b98a4d66;
+  background: linear-gradient(180deg, #22160b, #140d07);
+  color: #e9d6b2;
+  padding: 18px 18px 16px;
+  box-shadow: 0 24px 60px #000a;
+  font-size: 13px;
+  line-height: 1.7;
+}
+.xm-sheet h3 {
+  margin: 0 0 6px;
+  font-size: 15px;
+  font-weight: 500;
+  color: #ffe2ae;
+  letter-spacing: 0.02em;
+}
+.xm-sheet .xm-eyebrow {
+  font-size: 9px;
+  letter-spacing: 0.3em;
+  color: #a98a5e;
+  margin-bottom: 10px;
+}
+.xm-sheet ol {
+  margin: 6px 0 12px;
+  padding-left: 18px;
+  color: #dcc6a2;
+}
+.xm-sheet ol li {
+  margin-bottom: 4px;
+}
+.xm-sheet .xm-actions {
+  display: flex;
+  gap: 10px;
+}
+.xm-btn {
+  flex: 1;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid #a48a5944;
+  background: transparent;
+  color: #e9d6b2;
+  font-size: 13px;
+  transition: background 0.2s;
+}
+.xm-btn.primary {
+  border-color: #d7a46299;
+  background: #d7a4621f;
+  color: #ffe4b6;
+}
+.xm-btn:active {
+  background: #d7a4622e;
+}
+
+/* ---------- 移动端手势面板 ---------- */
+.xm-toggle {
+  position: fixed;
+  right: calc(14px + env(safe-area-inset-right));
+  bottom: calc(52px + env(safe-area-inset-bottom));
+  z-index: 70;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: 1px solid #b98a4d66;
+  background: #17100899;
+  color: #f0d9ac;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 8px 20px #0007;
+}
+.xm-toggle svg {
+  width: 22px;
+  height: 22px;
+}
+
+.xm-pad {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 85;
+  display: none;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 12px calc(12px + env(safe-area-inset-bottom));
+  background: linear-gradient(180deg, #0a0604e6, #0a0604f7);
+  border-top: 1px solid #b98a4d44;
+  color: #e9d6b2;
+  animation: xm-rise 0.22s ease both;
+}
+.xm-pad-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  color: #a98a5e;
+}
+.xm-pad-close {
+  border: 0;
+  background: none;
+  color: #c9b28a;
+  font-size: 18px;
+  line-height: 1;
+  padding: 0 4px;
+}
+.xm-chips {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+.xm-chip {
+  padding: 11px 4px;
+  border-radius: 10px;
+  border: 1px solid #a48a5944;
+  background: #ffffff08;
+  color: #ecd7ac;
+  font-size: 13px;
+  line-height: 1.25;
+}
+.xm-chip small {
+  display: block;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  color: #a98a5e;
+  margin-top: 2px;
+}
+.xm-chip:active {
+  background: #d7a4622e;
+  border-color: #d7a46288;
+}
+.xm-chip.wide {
+  grid-column: span 2;
+}
+
+.xm-toast {
+  position: fixed;
+  left: 50%;
+  bottom: calc(110px + env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  z-index: 88;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: #171008e6;
+  border: 1px solid #b98a4d55;
+  color: #ecd7ac;
+  font-size: 12px;
+  white-space: nowrap;
+  animation: xm-fade 0.3s ease both;
+}
+
+@keyframes xm-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes xm-rise {
+  from { transform: translateY(18px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@media (max-width: 900px), (pointer: coarse) {
+  .xm-toggle { display: flex; }
+}

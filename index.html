@@ -2,17 +2,41 @@
 <html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover"
+    />
     <meta name="theme-color" content="#030201" />
+    <meta name="format-detection" content="telephone=no" />
     <meta
       name="description"
-      content="A real-time golden particle Christmas experience. Shape stardust with your hands."
+      content="用手把星尘聚成一棵圣诞树：手势识别、数字粒子、圣诞快乐与天天开心。用手机浏览器打开即可，无需安装。"
     />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="圣诞粒子体验" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="圣诞粒子体验 · Merry Christmas" />
+    <meta
+      property="og:description"
+      content="星尘在指尖流动：手势识别、数字粒子、圣诞快乐与天天开心，打开就能玩。"
+    />
+    <meta property="og:image" content="/share-cover.png" />
+    <meta itemprop="name" content="圣诞粒子体验 · Merry Christmas" />
+    <meta itemprop="image" content="/share-cover.png" />
+
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <title>Christmas · A Little Wonder</title>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="stylesheet" href="/wechat-enhance.css" />
+    <title>圣诞粒子体验 · Merry Christmas</title>
   </head>
   <body>
     <div id="root"></div>
+    <img class="xm-preview" src="/share-cover.png" alt="圣诞粒子体验预览" aria-hidden="true" />
+    <script src="/wechat-enhance.js" defer></script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
