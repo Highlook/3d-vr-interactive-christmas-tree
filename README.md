@@ -92,3 +92,17 @@ E2E_PRODUCTION=1 npm run test:e2e
 Playwright 使用本机 Edge；摄像头测试是虚拟视频流，模型和 WASM 推理器真实初始化。截图在 artifacts，完整结果见 VALIDATION.md。
 
 真实手势准确率与摄像头端到端延迟需真人在实际光照下验收。原始演示视频未包含在本次压缩包中，本次没有据此宣称逐帧复刻或主观电影级验收。字体授权及依赖许可保留于原工程。
+
+## 在线地址与微信分享
+
+在线站点：<https://highlook.github.io/christmas-particle-experience/>
+
+推送到 `main` 会自动构建并部署（`.github/workflows/pages.yml`），无需手工上传。
+
+针对手机和微信的额外处理：
+
+- `public/wechat-enhance.js` / `wechat-enhance.css`：微信内置浏览器打开时，顶部提示如何在浏览器中打开；手机端提供手势按钮面板（数字 1/2/3、OK、握拳、五指、圣诞快乐、星尘重聚），复用页面原有的键盘事件，不改动渲染逻辑。
+- `public/manifest.webmanifest` 与图标：支持「添加到主屏幕」，加进去后全屏打开，像 App。
+- `index.html` 增加分享标题、封面图（`og:image`）以及移动端视口 / 安全区设置。
+
+微信里给对方的一句话：点右上角「···」→「在浏览器打开」（iPhone 是「在 Safari 中打开」），再允许摄像头即可。
