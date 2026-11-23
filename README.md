@@ -1,108 +1,117 @@
-# Christmas Particle Experience · 截图地台与水平旋转版
+# 3D 虚拟现实交互式圣诞树
 
-本项目在原工程上升级，保留 Three.js、MediaPipe、本地 Worker、ParticleSystem、ParticleText、ParticleMorph 和可取消动画状态机。
+**3D VR Interactive Christmas Tree**
 
-## 当前构图
+用一双手把星尘聚成一棵圣诞树。Three.js 金色粒子 + MediaPipe 本地手势识别，摄像头画面只在本机处理，模型、WASM、字体全部随包离线加载。
 
-地台恢复到截图版本：完整的三层金色圆环、直边六芒星、柔光盘和少量辅助星尘；外圈独立慢转。撤回大地台、半月前沿及圆角六芒星。保留当前1.17倍树组、增强的金色光晕与树底贴台位置。
+在线体验 → **<https://highlook.github.io/3d-vr-interactive-christmas-tree/>**
 
-鼠标及单指触屏只控制左右（Y轴）旋转，上下拖动不再让树倾斜。保留松手惯性及空闲后缓慢自转；手势、文字、数字与全树聚合规则保持当前行为。
+![圣诞粒子体验预览](public/share-cover.png)
 
-## 双击打开
+## 它能做什么
 
-解压完整工程后，在工程根目录双击 `启动源码版.bat`，会自动启动源码开发服务并打开浏览器；首次缺少依赖时自动执行 `npm ci`。保存源码修改后网页自动更新，使用期间保留启动窗口。
+- **手势直接驱动画面**：比 1 / 2 / 3 出现粒子数字，OK 手势与三指同样走「数字 3 → 圣诞快乐」，握拳把当前星尘连续聚回成树，五指展开显示「天天开心」。
+- **一切都在粒子层完成**：数字、中文祝福、金色飘带、树顶星共享同一套粒子系统，形态之间平滑变换，没有切换场景或淡入淡出的黑屏。
+- **手机也能玩全套**：没给摄像头权限时，右下角「✋」展开手势按钮面板（数字 1/2/3、OK、握拳、五指、圣诞快乐、星尘重聚），效果与手势一致。
+- **微信可直接分享**：内置提示引导「在浏览器打开」，支持添加到主屏幕，加进去以后全屏打开像 App。
+- **离线可跑**：`public/` 里带着 Noto Sans SC 字体切片、MediaPipe WASM 与手部关键点模型，不依赖任何 CDN。
 
-也可以双击 `创建桌面快捷方式.bat`，在当前电脑桌面生成“圣诞粒子体验”入口。此入口打开随包附带的 `release/site` 成品网页，自动启动或复用本地 8080 服务；修改源码后如需更新成品，需要重新构建并同步成品目录。解压或移动工程后请在新位置重新创建快捷方式。不要直接双击 HTML，也不要在压缩包内直接运行启动文件。
-
-## 运行
-
-建议 Node.js 22.12+、支持 WebGL 的 Chrome / Edge。进入本项目目录执行：
+## 快速开始
 
 ```bash
+# Node.js 22.12+；Chrome / Edge 等支持 WebGL2 的浏览器
 npm ci
 npm run dev
 ```
 
-打开终端中的 localhost 地址。网页加载后自动申请摄像头权限，允许后自动开始本地手势识别；页面不再提供摄像头启动/停止按钮。首次权限由浏览器确认，已授权时直接启动；模型/WASM/字体均本地加载。拒绝权限可继续键盘操作；可在浏览器站点设置中允许摄像头后刷新。离开页面释放摄像头，浏览器缓存恢复页面时自动重新连接。部署使用 `npm run build` 生成的 dist，放在 HTTPS 站点根路径；不要直接双击 HTML。
+打开终端里的 localhost 地址即可。网页加载后会自动申请摄像头权限，允许后自动开始本地手势识别；拒绝权限也能用键盘或手机按钮继续玩。
 
-## 分发（不提供源码）
+Windows 上也可以直接双击 `启动源码版.bat`（首次自动 `npm ci`），或 `创建桌面快捷方式.bat` 生成一个指向 `release/site` 成品页的桌面入口。
 
-`release/` 是免源码发布包，`site/` 只有构建产物（压缩后的 JS/CSS、字体、MediaPipe WASM 与手部模型），不含 `src/`、sourcemap 或工程配置：
+## 操作对照
 
-- `start.bat`：本机起服务，同一 WiFi 下的手机/平板用 `https://局域网IP:8443` 访问；首次需接受一次自签证书警告，之后摄像头可授权。
-- `share-public.bat`：cloudflared quick tunnel 生成临时 `https://*.trycloudflare.com` 链接，任何网络都能用，关窗口即失效。
-- 永久托管：只上传 `release/site/` 到 Cloudflare Pages / Netlify / Vercel / GitHub Pages。构建已用 `base: "./"`，放在子路径（如 `用户名.github.io/仓库名/`）也能加载模型与字体。
-
-详细步骤与常见问题见 `release/使用说明.md`；可移交的压缩包为 `../Christmas-Experience-Web.zip`。
-
-
-## 操作
-
-| 输入 | 键盘 | 结果 |
+| 手势 | 键盘 | 结果 |
 |---|---|---|
-| 单指 | 1 | 数字 1 |
-| 两指 | 2 | 数字 2 |
-| 三指 | 3 | 独立数字 3，识别后 1 秒切换圣诞快乐 |
-| OK（拇食指接近，其他手指任意） | O | 同三指：数字 3 → 圣诞快乐 |
-| 握拳 | F / R | 从当前粒子位置连续汇聚恢复树 |
-| 五指展开 | 空格 | 天天开心，停留后回树 |
-| 独立祝福按钮 | T | 圣诞快乐 |
-| 鼠标左键 / 单指拖动 | — | 水平转 Y，垂直不改变倾角；释放惯性衰减，约 3 秒后平滑恢复慢速自转 |
+| 单指 | `1` | 数字 1 |
+| 两指 | `2` | 数字 2 |
+| 三指 | `3` | 独立数字 3，1 秒后切换「圣诞快乐」 |
+| OK（拇指与食指接近，其余手指随意） | `O` | 同三指 |
+| 握拳 | `F` / `R` | 从当前粒子位置连续汇聚成树 |
+| 五指展开 | `空格` | 「天天开心」，停留后回到树 |
+| — | `T` | 直接显示「圣诞快乐」 |
+| 鼠标左键 / 单指拖动 | — | 只绕 Y 轴水平旋转；松手有惯性，约 3 秒后恢复慢速自转 |
 
-数字拥有独立的 2,400 点粒子层，不借用树体粒子。数字模式持续支持拖动与惯性，输入和渲染互不阻塞；树体、飘带、树顶星共享文字轮廓并同时开始聚合；中文通过逆树组矩阵保持朝向，树组旋转不会带动文字。标题、星空、六芒星地台及飘雪不在树组内。仅允许绕Y轴水平旋转，垂直倾角固定为0。
+手机上还能点右下角「✋」打开按钮面板，等价于上表的手势。
 
-## 本次视觉升级
+## 技术实现
 
-- 截图版直边实体六芒星内阵、三层慢转圆环、半透明柔光盘与少量辅助星尘，地台轮廓完整可见。
-- 5,200颗星独立慢闪，带少量星芒；260点稀疏GPU飘雪。
-- 树点略大、金白色更亮，三层银白粒子带加宽；立体粒子顶星配柔光，树体增大6%并加强分层枝冠。
-- 数字恢复直接平滑变换，数字与中文均为直立新字体，保留完整笔画与金白光晕。
-- 宽屏操作区移到右侧，中央地台完整展示。
+**渲染（Three.js 0.170）**
 
-## 保留架构与实现
+- 单一 `ParticleTreeGroup` 承载树体、12,000 点飘带与树顶星；数字是独立的 2,400 点粒子层，不借用树体粒子。
+- 树体/飘带/顶星共享文字轮廓并同时开始聚合；中文用逆树组矩阵保持正立，旋转树体不会带动文字。
+- 六芒星地台、三层慢转圆环、半透明柔光盘、5,200 颗独立慢闪星空、260 点 GPU 飘雪，以及 UnrealBloom 后期；文字与树模式平滑调整 Bloom 强度。
+- 实测约 5.1 万粒子，FPS 低于阈值时自动降分辨率而不是停动画。
 
-- `gestureConfig.ts`：160ms 确认、0.75 投票比例、200ms 冷却、至少 3 独立帧，上限 30Hz。该置信度为时间窗投票比例，不是假造的模型概率。
-- `classifier.ts`：掌宽归一化 OK 优先；连续投票、边沿检测、稳定释放重置、异常时间戳与重复帧过滤。
-- `HandTracker.ts`：requestVideoFrameCallback 视频新帧调度，独立 timer 回退；单帧在途，不在渲染循环推理；移除识别前会累积延迟的坐标 EMA。
-- `AnimationStateMachine.ts`：OK/三指统一 NUMBER_3，事件发出 1 秒后切换圣诞快乐；新输入会取消旧定时。五指显示天天开心，握拳直接连续回树。
-- `ParticleNumbers.ts`：独立缓冲与光晕 Shader；0.8 秒凝聚、0.35 秒淡入；数字切换带受控弧线舒展（X方向最大0.38世界单位，Y/Z更小），结束准确落回目标，数字切换捕捉当前坐标保持连续；不会旋转树体。
-- `ChristmasTree.ts`：金/香槟金完整三维圆锥，外壳与体积粒子混合，金色螺旋装饰；没有红色云团。
-- `ParticleRibbon.ts`：12,000 点，核心 25%、银白宽层 50%、浮尘 25%。宽度来自真实 XYZ 分布，非放大单点。GPU 沿 3.7 圈螺旋连续流动；独立速度、相位、厚度、端点淡出与缓慢飘移。所有层都在 ParticleTreeGroup，无实体丝带几何体。
-- `SceneManager.ts`：独立 ParticleTreeGroup、Pointer Capture、惯性与阻尼、自转恢复、树体呼吸、清理监听器。FPS 使用实际帧时间而非截断的动画步长，粒子统计包括树体、独立数字、丝带与星空；缩放及降画质不再取消动画。
-- `StarField.ts`：每颗星独立 phase/frequency/min/max，约 12–39 秒周期及少量慢闪光，GPU 计算亮度。
-- `ParticleText.ts`：本地Noto Sans SC Variable 600直立中文与正体数字、逐字回退检测、Canvas alpha 阈值 100、4px 采样、确定性浮雕点分布；Shader 径向核/光晕、金/白金色、轻漂浮与闪烁。
-- `PostProcessing.ts`：保留 UnrealBloomPass，文字与树模式平滑调整 Bloom。
+**手势（MediaPipe Tasks Vision）**
 
-## 可调参数
+- 视频帧进 Worker 做 `createImageBitmap` 推理，主线程不阻塞；Worker 初始化失败自动回退主线程，GPU 失败回退 CPU。
+- `gestureConfig.ts`：160ms 确认窗、0.75 投票比例、200ms 冷却、至少 3 个独立帧，推理上限 30Hz（该置信度是时间窗投票比例，不是编造的模型概率）。
+- `classifier.ts`：掌宽归一化、OK 优先、边沿检测、稳定释放重置、异常时间戳与重复帧过滤。
 
-`src/config/gestureConfig.ts`：gestureConfirmMs、gestureConfidenceThreshold、gestureCooldownMs、gestureStableFrames。
+**交互与状态**
 
-`src/config/particleConfig.ts`：textParticleSpacing（Canvas采样步长）、textParticleDensity（可见粒子比例）、textParticleSize、textGlowIntensity、textBloomStrength。默认分别为 4、0.34、3.6、2.0、0.72。15k/20k/26k 原粒子池保留，文字通过确定性抽样控制疏密；目标只在形态变化时更新。
+- `AnimationStateMachine.ts` 管理全部形态迁移：OK/三指统一为 NUMBER_3，事件发出 1 秒后切文字，新输入取消旧定时。
+- 数字切换会捕捉当前坐标做受控弧线舒展（X 方向最大 0.38 世界单位），结束精确落回目标，不会跳变。
+- 指针捕获 + 阻尼 + 空闲自转，垂直倾角固定为 0。
 
-## 验证
+**可调参数**
 
-```bash
-npm test
-npm run build
-npm run test:e2e
-# Bash：生产构建验证
-E2E_PRODUCTION=1 npm run test:e2e
+- `src/config/gestureConfig.ts`：`gestureConfirmMs`、`gestureConfidenceThreshold`、`gestureCooldownMs`、`gestureStableFrames`
+- `src/config/particleConfig.ts`：`textParticleSpacing`（Canvas 采样步长）、`textParticleDensity`、`textParticleSize`、`textGlowIntensity`、`textBloomStrength`，默认 4 / 0.34 / 3.6 / 2.0 / 0.72
+
+## 目录结构
+
+```
+.
+├─ src/
+│  ├─ three/        场景、粒子、文字、星空、后期与状态机
+│  ├─ gestures/     MediaPipe 手部关键点、Worker、手势分类
+│  ├─ components/   页面与 HUD
+│  └─ config/       手势与粒子参数
+├─ public/          字体切片、WASM、手部模型、图标、微信增强层
+├─ tests/           单元测试（Vitest，79 条）
+├─ e2e/             Playwright 端到端用例（含并发与触摸）
+├─ scripts/         构建前资源准备
+├─ release/         免源码交付包（site/ 为构建产物）
+└─ .github/workflows/pages.yml   推 main 自动构建并发布 Pages
 ```
 
-Playwright 使用本机 Edge；摄像头测试是虚拟视频流，模型和 WASM 推理器真实初始化。截图在 artifacts，完整结果见 VALIDATION.md。
+## 构建与部署
 
-真实手势准确率与摄像头端到端延迟需真人在实际光照下验收。原始演示视频未包含在本次压缩包中，本次没有据此宣称逐帧复刻或主观电影级验收。字体授权及依赖许可保留于原工程。
+```bash
+npm run build     # 输出 dist/，base 为 "./"，可放根目录或任意子路径
+npm test          # 79 条单元测试
+npm run test:e2e  # Playwright，默认使用本机 Edge
+```
 
-## 在线地址与微信分享
+- **GitHub Pages**：推送到 `main` 后由 `.github/workflows/pages.yml` 自动 `npm ci` → 测试 → 构建 → 部署，无需手工上传。
+- **任意静态托管**：把 `dist/` 上传到 Cloudflare Pages / Netlify / Vercel / 对象存储均可。`release/` 里另有免源码交付包（`site/` 成品 + 本机启动脚本 + 使用说明），适合直接发给不想碰源码的人。
+- **摄像头只认安全上下文**：必须 `https://` 或 `localhost`。局域网 `http://192.168.x.x` 会开页面但拿不到摄像头，这是浏览器规则，不是项目限制。
 
-在线站点：<https://highlook.github.io/3d-vr-interactive-christmas-tree/>
+## 微信分享
 
-推送到 `main` 会自动构建并部署（`.github/workflows/pages.yml`），无需手工上传。
+微信内置浏览器对摄像头和 WebGL 的支持不稳定，页面会主动提示：
 
-针对手机和微信的额外处理：
+> 点右上角「···」→「在浏览器打开」（iPhone 是「在 Safari 中打开」），再允许摄像头即可。
 
-- `public/wechat-enhance.js` / `wechat-enhance.css`：微信内置浏览器打开时，顶部提示如何在浏览器中打开；手机端提供手势按钮面板（数字 1/2/3、OK、握拳、五指、圣诞快乐、星尘重聚），复用页面原有的键盘事件，不改动渲染逻辑。
-- `public/manifest.webmanifest` 与图标：支持「添加到主屏幕」，加进去后全屏打开，像 App。
-- `index.html` 增加分享标题、封面图（`og:image`）以及移动端视口 / 安全区设置。
+相关实现都在 `public/wechat-enhance.js` 与 `public/wechat-enhance.css`：微信内提示、手机手势面板、以及 `manifest.webmanifest` 带来的「添加到主屏幕」。它们只复用页面已有的键盘事件，不改动渲染逻辑。
 
-微信里给对方的一句话：点右上角「···」→「在浏览器打开」（iPhone 是「在 Safari 中打开」），再允许摄像头即可。
+## 测试与已知限制
+
+- 单元测试 79 条，覆盖形态迁移、粒子目标、文字布局、手势分类、并发与清理。
+- Playwright 用虚拟视频流跑真实模型与 WASM 推理，截图产物在本地 `artifacts/`（未入库）。
+- 真实光照下的手势准确率与端到端延迟需要真人验收；低端机建议直接用手势按钮。
+
+## 许可
+
+字体与依赖的开源许可保留在 `licenses/`：Great Vibes、Noto Sans SC（SIL OFL 1.1），React、Three.js（MIT）。MediaPipe 手部模型与 WASM 来自 `@mediapipe/tasks-vision`，遵循其上游许可。
