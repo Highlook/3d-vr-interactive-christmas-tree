@@ -95,7 +95,7 @@ Playwright 使用本机 Edge；摄像头测试是虚拟视频流，模型和 WAS
 
 ## 在线地址与微信分享
 
-在线站点：<https://highlook.github.io/christmas-particle-experience/>
+在线站点：<https://highlook.github.io/3d-vr-interactive-christmas-tree/>
 
 推送到 `main` 会自动构建并部署（`.github/workflows/pages.yml`），无需手工上传。
 
