@@ -6,6 +6,7 @@ import {
   type Landmark,
 } from "./classifier";
 import { createDetector, type Detector } from "./vision";
+import { warmHandAssets, type HandAssets } from "./assetLoader";
 import { writeHandDiagnostics } from "./diagnostics";
 
 type WorkerReply =
@@ -43,6 +44,7 @@ export class HandTracker {
   private inferenceMark = 0;
   private inferenceFps = 0;
   private stabilizer = new GestureStabilizer();
+  private assetTask: Promise<HandAssets | null> | null = null;
   private readonly pagehide = () => this.stop();
 
   constructor(
@@ -75,6 +77,16 @@ export class HandTracker {
         );
       this.onStatus("Requesting camera permission…");
       window.addEventListener("pagehide", this.pagehide);
+      // 模型/wasm 的下载与摄像头授权并行：授权弹窗那几秒正好用来下 8 MB 资源。
+      if (!this.assetTask)
+        this.assetTask = warmHandAssets().catch((error: unknown) => {
+          writeHandDiagnostics({
+            lastError: `asset download: ${
+              error instanceof Error ? error.message : String(error)
+            }`,
+          });
+          return null;
+        });
       // Request immediately when started; the browser owns the permission prompt.
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
@@ -151,15 +163,23 @@ export class HandTracker {
     });
   }
 
-  private initWorker(generation: number): Promise<void> {
+  private async initWorker(generation: number): Promise<void> {
     if (
       typeof Worker === "undefined" ||
       typeof createImageBitmap !== "function"
     )
-      return Promise.reject(
-        new Error("Worker bitmap inference is unsupported."),
-      );
-    return new Promise((resolve, reject) => {
+      throw new Error("Worker bitmap inference is unsupported.");
+    // 等预下载完成（首次约 8 MB，之后走 IndexedDB 直接命中）。
+    const assets = await this.assetTask;
+    if (!this.current(generation)) return;
+    const payload = assets
+      ? {
+          loaderUrl: assets.loaderUrl,
+          wasmUrl: assets.wasmUrl,
+          modelBuffer: assets.modelBuffer,
+        }
+      : null;
+    await new Promise<void>((resolve, reject) => {
       const worker = new Worker(
         new URL("mediapipe/hand.worker.js", window.location.href),
       );
@@ -210,7 +230,7 @@ export class HandTracker {
           this.accept(reply.landmarks, reply.timestamp);
         }
       };
-      worker.postMessage({ type: "init", baseUrl: window.location.href });
+      worker.postMessage({ type: "init", baseUrl: window.location.href, assets: payload });
     });
   }
 
@@ -220,7 +240,8 @@ export class HandTracker {
         ? "Loading CPU tracker…"
         : "Loading main-thread tracker…",
     );
-    const result = await createDetector(window.location.href, cpuOnly);
+    const assets = await this.assetTask;
+    const result = await createDetector(window.location.href, cpuOnly, assets);
     if (!this.current(generation)) {
       result.detector.close();
       return;

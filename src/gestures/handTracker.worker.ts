@@ -1,7 +1,7 @@
-import { createDetector, type Detector } from "./vision";
+import { createDetector, type Detector, type DetectorAssets } from "./vision";
 
 type Request =
-  | { type: "init"; baseUrl: string }
+  | { type: "init"; baseUrl: string; assets?: DetectorAssets | null }
   | { type: "frame"; bitmap: ImageBitmap; timestamp: number };
 const scope = globalThis as unknown as {
   onmessage: ((event: MessageEvent<Request>) => void) | null;
@@ -11,7 +11,7 @@ let detector: Detector | null = null;
 scope.onmessage = (event) => {
   const message = event.data;
   if (message.type === "init") {
-    void createDetector(message.baseUrl)
+    void createDetector(message.baseUrl, false, message.assets ?? null)
       .then((result) => {
         detector = result.detector;
         scope.postMessage({ type: "ready", delegate: result.delegate });

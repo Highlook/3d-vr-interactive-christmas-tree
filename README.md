@@ -69,15 +69,26 @@ Windows 上也可以直接双击 `启动源码版.bat`（首次自动 `npm ci`�
 - `src/config/gestureConfig.ts`：`gestureConfirmMs`、`gestureConfidenceThreshold`、`gestureCooldownMs`、`gestureStableFrames`
 - `src/config/particleConfig.ts`：`textParticleSpacing`（Canvas 采样步长）、`textParticleDensity`、`textParticleSize`、`textGlowIntensity`、`textBloomStrength`，默认 4 / 0.34 / 3.6 / 2.0 / 0.72
 
+## 加载速度（手机 / 微信场景）
+
+手势识别要下 16.6 MB 的 WASM 与模型，GitHub Pages 在国内移动网络实测只有几十 KB/s，首次要一两分钟。现在的做法是四层：
+
+1. **gzip 预压缩**：`scripts/prepare-assets.mjs` 生成 `.gz` 副本（WASM 9.13→2.79 MB，模型 7.46→5.53 MB），浏览器用 `DecompressionStream` 现场解压，总传输降到约 8.3 MB。
+2. **国内镜像优先**：页面挂载时并发探测 `gh-proxy.com` / `ghfast.top` / jsDelivr，取最快一路；某一路中途失败自动换下一路，全挂则回退本站。选中的线路记在 `localStorage`，6 小时内不再探测。
+3. **IndexedDB 永久缓存**：下载一次就写进本地库，之后打开完全不联网（实测第二次打开 394 ms 进入识别状态）。
+4. **进度可见**：手机顶部卡片、左下状态栏实时显示「已下载 / 总量 · 速度」，不再是干等；下载失败会明确提示可先用按钮面板。
+
+下载与摄像头授权、WebGL 初始化并行，所以往往是「树先亮起来，模型随后就绪」。排查时可加 `?assets=local` 强制走本站资源。
+
 ## 目录结构
 
 ```
 .
 ├─ src/
 │  ├─ three/        场景、粒子、文字、星空、后期与状态机
-│  ├─ gestures/     MediaPipe 手部关键点、Worker、手势分类
+│  ├─ gestures/     MediaPipe 手部关键点、Worker、手势分类、资源下载与缓存
 │  ├─ components/   页面与 HUD
-│  └─ config/       手势与粒子参数
+│  └─ config/       手势、粒子与资源分发参数
 ├─ public/          字体切片、WASM、手部模型、图标、微信增强层
 ├─ tests/           单元测试（Vitest，79 条）
 ├─ e2e/             Playwright 端到端用例（含并发与触摸）

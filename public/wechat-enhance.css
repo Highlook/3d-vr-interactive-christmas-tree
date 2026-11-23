@@ -214,6 +214,50 @@
   animation: xm-fade 0.3s ease both;
 }
 
+/* ---------- 手势模型下载进度（手机端） ---------- */
+.xm-load {
+  position: fixed;
+  left: 50%;
+  top: calc(56px + env(safe-area-inset-top));
+  transform: translateX(-50%);
+  z-index: 78;
+  width: min(300px, calc(100vw - 32px));
+  padding: 10px 13px 11px;
+  border-radius: 12px;
+  border: 1px solid #b98a4d55;
+  background: #17100899;
+  color: #ecd7ac;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 10px 28px #0007;
+  animation: xm-fade 0.3s ease both;
+}
+.xm-load-title {
+  font-size: 11px;
+  letter-spacing: 0.03em;
+  color: #cbb489;
+  margin-bottom: 7px;
+}
+.xm-load-bar {
+  height: 3px;
+  border-radius: 2px;
+  background: #ffffff14;
+  overflow: hidden;
+}
+.xm-load-bar i {
+  display: block;
+  height: 100%;
+  width: 1%;
+  background: linear-gradient(90deg, #8f6c32, #f0d9a3);
+  transition: width 0.25s linear;
+}
+.xm-load-meta {
+  margin-top: 6px;
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  color: #a98a5e;
+}
+
 @keyframes xm-fade {
   from { opacity: 0; }
   to { opacity: 1; }

@@ -164,9 +164,47 @@
     return !!document.querySelector(".status .led.connected");
   }
 
+  /* ------------------ 手势模型加载进度 ------------------ */
+  var loadPill = null;
+
+  function speedText(bps) {
+    if (!bps) return "";
+    if (bps >= 1048576) return " · " + (bps / 1048576).toFixed(1) + " MB/s";
+    return " · " + Math.max(1, Math.round(bps / 1024)) + " KB/s";
+  }
+
+  function assetProgress() {
+    window.addEventListener("xm-asset-progress", function (event) {
+      var d = event.detail;
+      if (!d) return;
+      if (d.done) {
+        if (loadPill) { loadPill.remove(); loadPill = null; }
+        if (d.failed) toast("手势模型下载失败 · 可先用手势按钮 / 键盘体验", 3200);
+        return;
+      }
+      var pct = Math.max(1, Math.min(99, Math.round(d.percent || 0)));
+      if (!loadPill) {
+        loadPill = el(
+          '<div class="xm-load">' +
+            '<div class="xm-load-title">首次加载手势识别模型 · 之后会本地缓存</div>' +
+            '<div class="xm-load-bar"><i></i></div>' +
+            '<div class="xm-load-meta"><span></span></div>' +
+            "</div>"
+        );
+        document.body.appendChild(loadPill);
+      }
+      loadPill.querySelector("i").style.width = pct + "%";
+      loadPill.querySelector("span").textContent =
+        pct + "% · " +
+        (d.loadedBytes / 1048576).toFixed(1) + "/" + (d.totalBytes / 1048576).toFixed(1) + " MB" +
+        speedText(d.bytesPerSecond);
+    });
+  }
+
   function init() {
     if (isWeChat) wechatTip();
     if (isTouch) {
+      assetProgress();
       buildToggle();
       // 摄像头 8 秒内没连上（微信内一般如此），自动展开手势面板一次
       var tries = 0;

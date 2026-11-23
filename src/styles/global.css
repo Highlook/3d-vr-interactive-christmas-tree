@@ -266,6 +266,24 @@ dd {
 .performance span {
   margin: 0 6px;
 }
+.load-state {
+  margin-top: 10px;
+  font-size: 7px;
+  letter-spacing: 0.08em;
+  color: #cbb489;
+}
+.load-state span {
+  display: block;
+  margin-bottom: 5px;
+  white-space: nowrap;
+}
+.load-state i {
+  display: block;
+  height: 2px;
+  background: linear-gradient(90deg, #8f6c32, #e8d2a0);
+  box-shadow: 0 0 6px #d8b26590;
+  transition: width 0.2s linear;
+}
 .bottom-note {
   position: absolute;
   right: 34px;

@@ -5,6 +5,10 @@ import type {
   InputGesture,
 } from "../three/AnimationStateMachine";
 import { HandTracker } from "../gestures/HandTracker";
+import {
+  ASSET_PROGRESS_EVENT,
+  type AssetProgressDetail,
+} from "../gestures/assetLoader";
 import Diagnostics from "./Diagnostics";
 const labels: Record<AnimationState, string> = {
   INITIAL: "圣诞树 · TREE",
@@ -40,6 +44,32 @@ export default function Experience() {
     particles: 0,
     quality: "高画质",
   });
+  const [load, setLoad] = useState<{ text: string; percent: number } | null>(
+    null,
+  );
+  useEffect(() => {
+    const onProgress = (event: Event) => {
+      const detail = (event as CustomEvent<AssetProgressDetail>).detail;
+      if (detail.done) {
+        setLoad(null);
+        if (detail.failed)
+          setCamera("识别模型下载失败 · 可先用键盘/手势按钮体验");
+        return;
+      }
+      const loadedMb = (detail.loadedBytes / 1048576).toFixed(1);
+      const totalMb = (detail.totalBytes / 1048576).toFixed(1);
+      const speed =
+        detail.bytesPerSecond >= 1048576
+          ? `${(detail.bytesPerSecond / 1048576).toFixed(1)} MB/s`
+          : `${Math.max(1, Math.round(detail.bytesPerSecond / 1024))} KB/s`;
+      setLoad({
+        text: `识别模型 ${loadedMb} / ${totalMb} MB · ${speed}`,
+        percent: detail.percent,
+      });
+    };
+    window.addEventListener(ASSET_PROGRESS_EVENT, onProgress);
+    return () => window.removeEventListener(ASSET_PROGRESS_EVENT, onProgress);
+  }, []);
   useEffect(() => {
     try {
       scene.current = new SceneManager(host.current!, setState, setStats);
@@ -211,6 +241,12 @@ export default function Experience() {
           {stats.particles ? stats.particles.toLocaleString() : "—"} POINTS{" "}
           <span>·</span> {stats.fps || "—"} FPS <span>·</span> {stats.quality}
         </div>
+        {load && (
+          <div className="load-state" role="status" aria-live="polite">
+            <span>{load.text}</span>
+            <i style={{ width: `${load.percent}%` }} aria-hidden="true" />
+          </div>
+        )}
       </aside>
       <div className="bottom-note">
         SHAPE THE LIGHT. <span>FEEL THE WONDER.</span>
